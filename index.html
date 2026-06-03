@@ -487,6 +487,24 @@
       <button class="btn-restart" onclick="restart()">Start a new brief</button>
     </div>
     <div class="copy-confirm" id="copy-confirm">Copied — paste it wherever you need it.</div>
+
+    <!-- Follow-up section -->
+    <div style="margin-top: 2rem; border-top: 1px solid var(--warm-mid); padding-top: 2rem;">
+      <div style="font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--ink-mid); margin-bottom: 0.5rem;">Have a follow-up question?</div>
+      <div style="font-size: 0.82rem; color: var(--ink-light); margin-bottom: 1rem;">Ask anything about your brief — the coach will answer in context.</div>
+      <textarea id="followup-input" rows="2" placeholder="e.g. What if I can't find a free hour today?" style="width: 100%; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--ink); background: var(--warm); border: 1px solid var(--warm-mid); border-radius: var(--radius-sm); padding: 0.75rem 1rem; resize: none; outline: none; margin-bottom: 0.75rem;"></textarea>
+      <button class="btn-primary" onclick="askFollowup()" id="followup-btn" style="width: 100%;">Ask the coach</button>
+
+      <div id="followup-loading" style="display: none; text-align: center; padding: 1.5rem 0;">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <div style="font-size: 0.85rem; color: var(--ink-light); margin-top: 0.75rem; font-style: italic;">Thinking…</div>
+      </div>
+
+      <div id="followup-answers"></div>
+    </div>
+
   </div>
 
 </div>
@@ -612,6 +630,84 @@
     const el = document.getElementById('error-wrap');
     el.textContent = msg;
     el.style.display = 'block';
+  }
+
+  let currentBrief = '';
+
+  function getBriefText() {
+    const sections = [
+      { label: 'Current state', id: 'out-1' },
+      { label: 'What needs attention first', id: 'out-2' },
+      { label: 'Constraints in play', id: 'out-3' },
+      { label: 'Open question', id: 'out-4' },
+      { label: 'How to start right now', id: 'out-5' }
+    ];
+    return sections.map(s =>
+      s.label.toUpperCase() + '\n' + document.getElementById(s.id).textContent
+    ).join('\n\n');
+  }
+
+  async function askFollowup() {
+    const question = document.getElementById('followup-input').value.trim();
+    if (!question) return;
+
+    const brief = getBriefText();
+    const btn = document.getElementById('followup-btn');
+    const loading = document.getElementById('followup-loading');
+    const answersDiv = document.getElementById('followup-answers');
+
+    btn.disabled = true;
+    loading.style.display = 'block';
+
+    try {
+      const response = await fetch('/api/followup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, brief })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong. Please try again.');
+      }
+
+      const card = document.createElement('div');
+      card.style.cssText = 'background: var(--white); border: 1px solid var(--warm-mid); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-top: 1rem;';
+
+      const q = document.createElement('div');
+      q.style.cssText = 'font-size: 0.78rem; font-weight: 500; color: var(--sage); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;';
+      q.textContent = 'Your question';
+
+      const qText = document.createElement('div');
+      qText.style.cssText = 'font-size: 0.88rem; color: var(--ink-mid); margin-bottom: 1rem; font-style: italic;';
+      qText.textContent = question;
+
+      const a = document.createElement('div');
+      a.style.cssText = 'font-size: 0.78rem; font-weight: 500; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;';
+      a.textContent = 'The coach says';
+
+      const aText = document.createElement('div');
+      aText.style.cssText = 'font-size: 0.95rem; color: var(--ink); line-height: 1.65;';
+      aText.textContent = data.answer;
+
+      card.appendChild(q);
+      card.appendChild(qText);
+      card.appendChild(a);
+      card.appendChild(aText);
+      answersDiv.appendChild(card);
+
+      document.getElementById('followup-input').value = '';
+
+    } catch (err) {
+      const errDiv = document.createElement('div');
+      errDiv.style.cssText = 'color: #c0392b; font-size: 0.88rem; margin-top: 0.75rem; text-align: center;';
+      errDiv.textContent = err.message;
+      answersDiv.appendChild(errDiv);
+    } finally {
+      btn.disabled = false;
+      loading.style.display = 'none';
+    }
   }
 </script>
 </body>
