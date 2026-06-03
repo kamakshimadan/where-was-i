@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { question, brief } = req.body;
+  const { question, brief, history } = req.body;
 
   if (!question || !brief) {
     return res.status(400).json({ error: 'Question and brief are required.' });
@@ -16,12 +16,26 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'API key not configured.' });
   }
 
-  const systemPrompt = `You are a warm but direct life coach. You have already given someone a "pick up here" brief to help them orient themselves on a recurring responsibility. They now have a follow-up question.
+  const systemPrompt = `You are a warm but direct life coach. You have already given someone a "pick up here" brief to help them orient themselves on a recurring responsibility. They now have follow-up questions.
 
 Here is the brief you gave them:
 ${brief}
 
-Answer their follow-up question in the same voice — warm, direct, simple language, no jargon. Be specific to their situation. Keep your answer focused and practical. No more than 3-4 sentences unless the question genuinely needs more.`;
+Answer their follow-up questions in the same voice — warm, direct, simple language, no jargon. Be specific to their situation. Keep your answers focused and practical. No more than 3-4 sentences unless the question genuinely needs more. You remember everything you have said in this conversation.`;
+
+  // Build full conversation history for Claude
+  const messages = [];
+
+  // Add previous Q&A pairs as alternating user/assistant turns
+  if (history && history.length > 0) {
+    history.forEach(turn => {
+      messages.push({ role: 'user', content: turn.question });
+      messages.push({ role: 'assistant', content: turn.answer });
+    });
+  }
+
+  // Add the new question
+  messages.push({ role: 'user', content: question });
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -35,7 +49,7 @@ Answer their follow-up question in the same voice — warm, direct, simple langu
         model: 'claude-sonnet-4-5',
         max_tokens: 500,
         system: systemPrompt,
-        messages: [{ role: 'user', content: question }]
+        messages: messages
       })
     });
 

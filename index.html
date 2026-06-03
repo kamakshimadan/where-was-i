@@ -502,7 +502,7 @@
         <div style="font-size: 0.85rem; color: var(--ink-light); margin-top: 0.75rem; font-style: italic;">Thinking…</div>
       </div>
 
-      <div id="followup-answers"></div>
+      <div id="followup-answers" style="max-height: 480px; overflow-y: auto; scroll-behavior: smooth;"></div>
     </div>
 
   </div>
@@ -623,6 +623,8 @@
     document.getElementById('progress-count').textContent = '0 of 6';
     document.getElementById('brief-section').style.display = 'none';
     document.getElementById('form-section').style.display = 'block';
+    document.getElementById('followup-answers').innerHTML = '';
+    followupHistory = [];
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -633,6 +635,7 @@
   }
 
   let currentBrief = '';
+  let followupHistory = [];
 
   function getBriefText() {
     const sections = [
@@ -663,7 +666,7 @@
       const response = await fetch('/api/followup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, brief })
+        body: JSON.stringify({ question, brief, history: followupHistory })
       });
 
       const data = await response.json();
@@ -697,7 +700,10 @@
       card.appendChild(aText);
       answersDiv.appendChild(card);
 
+      followupHistory.push({ question: question, answer: data.answer });
       document.getElementById('followup-input').value = '';
+      const answersBox = document.getElementById('followup-answers');
+      answersBox.scrollTop = answersBox.scrollHeight;
 
     } catch (err) {
       const errDiv = document.createElement('div');
