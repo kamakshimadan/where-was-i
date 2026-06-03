@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhereWasI — Pick up where you left off</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage: #4a7c59;
+    --sage-light: #eaf2ed;
+    --sage-mid: #c5dece;
+    --sage-dark: #2d5c3e;
+    --warm: #f7f4ef;
+    --warm-mid: #ede8df;
+    --ink: #1c1c1a;
+    --ink-mid: #4a4a46;
+    --ink-light: #8a8a84;
+    --accent: #c8763a;
+    --accent-light: #fdf0e6;
+    --white: #ffffff;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .page-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .header {
+    text-align: center;
+    padding: 3rem 0 2.5rem;
+  }
+
+  .logo {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--sage-dark);
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  .logo span {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .tagline {
+    font-size: 0.95rem;
+    color: var(--ink-light);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+  }
+
+  .progress-wrap {
+    margin: 0 0 2rem;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--warm-mid);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--sage);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .form-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--warm-mid);
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-card.answered {
+    border-color: var(--sage-mid);
+    background: linear-gradient(135deg, var(--white) 0%, var(--sage-light) 100%);
+  }
+
+  .question-num {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--sage);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .question-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .question-hint {
+    font-size: 0.82rem;
+    color: var(--ink-light);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  textarea, select {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    color: var(--ink);
+    background: var(--warm);
+    border: 1px solid var(--warm-mid);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    line-height: 1.5;
+  }
+
+  textarea:focus, select:focus {
+    border-color: var(--sage);
+    background: var(--white);
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a8a84' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+
+  .submit-wrap {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--sage-dark);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.9rem 2.5rem;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.2s ease, transform 0.1s ease;
+  }
+
+  .btn-primary:hover { background: var(--sage); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { background: var(--ink-light); cursor: not-allowed; }
+
+  .submit-note {
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    margin-top: 0.75rem;
+  }
+
+  /* Loading state */
+  .loading-wrap {
+    display: none;
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .loading-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--sage);
+    margin: 0 3px;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+
+  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .loading-text {
+    font-family: 'Fraunces', serif;
+    font-size: 1.1rem;
+    color: var(--ink-mid);
+    margin-top: 1.25rem;
+    font-style: italic;
+  }
+
+  /* Brief output */
+  .brief-wrap {
+    display: none;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .brief-header {
+    text-align: center;
+    padding: 2rem 0 1.5rem;
+  }
+
+  .brief-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: var(--sage-dark);
+    margin-bottom: 0.4rem;
+  }
+
+  .brief-subtitle {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+  }
+
+  .brief-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--warm-mid);
+    padding: 1.5rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .brief-section:first-of-type {
+    border-color: var(--sage-mid);
+    background: var(--sage-light);
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--sage);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.6rem;
+  }
+
+  .section-content {
+    font-size: 0.95rem;
+    color: var(--ink);
+    line-height: 1.65;
+  }
+
+  .attention-section {
+    background: var(--accent-light);
+    border-color: #f0c9a0;
+  }
+
+  .attention-section .section-label {
+    color: var(--accent);
+  }
+
+  .brief-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--sage-dark);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 99px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .btn-copy:hover { background: var(--sage); }
+
+  .btn-restart {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: transparent;
+    color: var(--ink-mid);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 400;
+    padding: 0.7rem 1.5rem;
+    border: 1px solid var(--warm-mid);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .btn-restart:hover { border-color: var(--ink-light); }
+
+  .copy-confirm {
+    display: none;
+    font-size: 0.78rem;
+    color: var(--sage);
+    text-align: center;
+    margin-top: 0.5rem;
+  }
+
+  .error-wrap {
+    display: none;
+    background: #fff3f3;
+    border: 1px solid #f5c5c5;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-size: 0.88rem;
+    color: #c0392b;
+    margin-top: 1rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <div class="header">
+    <div class="logo">Where<span>WasI</span></div>
+    <div class="tagline">Pick up where you left off — with a clear head.</div>
+  </div>
+
+  <!-- Form -->
+  <div id="form-section">
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Your answers</span>
+        <span id="progress-count">0 of 6</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="form-card" id="card-1">
+      <div class="question-num">Question 1 of 6</div>
+      <div class="question-text">What are you managing?</div>
+      <div class="question-hint">Tell us the one responsibility you're sitting down to work on today.</div>
+      <textarea id="q1" rows="2" placeholder="e.g. Planning meals for my family every week"></textarea>
+    </div>
+
+    <!-- Q2 -->
+    <div class="form-card" id="card-2">
+      <div class="question-num">Question 2 of 6</div>
+      <div class="question-text">How often do you come back to it?</div>
+      <div class="question-hint">Daily, weekly, monthly — or only when something comes up?</div>
+      <select id="q2">
+        <option value="">Choose one</option>
+        <option value="Every day">Every day</option>
+        <option value="A few times a week">A few times a week</option>
+        <option value="Once a week">Once a week</option>
+        <option value="A few times a month">A few times a month</option>
+        <option value="Once a month">Once a month</option>
+        <option value="Only when it needs attention">Only when it needs attention</option>
+      </select>
+    </div>
+
+    <!-- Q3 -->
+    <div class="form-card" id="card-3">
+      <div class="question-num">Question 3 of 6</div>
+      <div class="question-text">What was the last thing you did or decided?</div>
+      <div class="question-hint">Even a small action counts — the last email sent, the last call made, the last choice.</div>
+      <textarea id="q3" rows="2" placeholder="e.g. I decided to try a new schedule but haven't started yet"></textarea>
+    </div>
+
+    <!-- Q4 -->
+    <div class="form-card" id="card-4">
+      <div class="question-num">Question 4 of 6</div>
+      <div class="question-text">What's getting in your way this time?</div>
+      <div class="question-hint">Time, energy, another person, money — what's the real constraint today?</div>
+      <textarea id="q4" rows="2" placeholder="e.g. I keep getting interrupted by family priorities"></textarea>
+    </div>
+
+    <!-- Q5 -->
+    <div class="form-card" id="card-5">
+      <div class="question-num">Question 5 of 6</div>
+      <div class="question-text">What's one thing you haven't figured out yet?</div>
+      <div class="question-hint">Something you're unsure about or haven't decided yet.</div>
+      <textarea id="q5" rows="2" placeholder="e.g. I'm not sure how to stay consistent when I'm tired"></textarea>
+    </div>
+
+    <!-- Q6 -->
+    <div class="form-card" id="card-6">
+      <div class="question-num">Question 6 of 6</div>
+      <div class="question-text">What would make this session feel worthwhile?</div>
+      <div class="question-hint">If you closed this tab in an hour, what would need to have happened?</div>
+      <textarea id="q6" rows="2" placeholder="e.g. Having a clear plan I can actually follow tomorrow"></textarea>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-primary" id="submit-btn" onclick="generateBrief()">Generate my brief</button>
+      <div class="submit-note">Takes about 10 seconds.</div>
+      <div class="error-wrap" id="error-wrap"></div>
+    </div>
+
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-wrap" id="loading-section">
+    <div>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+      <span class="loading-dot"></span>
+    </div>
+    <div class="loading-text">Reading your answers and putting your brief together…</div>
+  </div>
+
+  <!-- Brief output -->
+  <div class="brief-wrap" id="brief-section">
+    <div class="brief-header">
+      <div class="brief-title">Your brief is ready</div>
+      <div class="brief-subtitle">Read this before you do anything else.</div>
+    </div>
+
+    <div class="brief-section" id="section-1">
+      <div class="section-label">Current state</div>
+      <div class="section-content" id="out-1"></div>
+    </div>
+
+    <div class="brief-section attention-section" id="section-2">
+      <div class="section-label">What needs attention first</div>
+      <div class="section-content" id="out-2"></div>
+    </div>
+
+    <div class="brief-section" id="section-3">
+      <div class="section-label">Constraints in play</div>
+      <div class="section-content" id="out-3"></div>
+    </div>
+
+    <div class="brief-section" id="section-4">
+      <div class="section-label">Open question</div>
+      <div class="section-content" id="out-4"></div>
+    </div>
+
+    <div class="brief-section" id="section-5">
+      <div class="section-label">How to start right now</div>
+      <div class="section-content" id="out-5"></div>
+    </div>
+
+    <div class="brief-actions">
+      <button class="btn-copy" onclick="copyBrief()">Copy brief</button>
+      <button class="btn-restart" onclick="restart()">Start a new brief</button>
+    </div>
+    <div class="copy-confirm" id="copy-confirm">Copied — paste it wherever you need it.</div>
+  </div>
+
+</div>
+
+<script>
+  const fields = ['q1','q2','q3','q4','q5','q6'];
+
+  fields.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', updateProgress);
+    el.addEventListener('change', updateProgress);
+  });
+
+  function updateProgress() {
+    let filled = 0;
+    fields.forEach((id, i) => {
+      const val = document.getElementById(id).value.trim();
+      const card = document.getElementById('card-' + (i + 1));
+      if (val) {
+        filled++;
+        card.classList.add('answered');
+      } else {
+        card.classList.remove('answered');
+      }
+    });
+    document.getElementById('progress-count').textContent = filled + ' of 6';
+    document.getElementById('progress-fill').style.width = (filled / 6 * 100) + '%';
+  }
+
+  async function generateBrief() {
+    const answers = fields.map(id => document.getElementById(id).value.trim());
+    const empty = answers.filter(a => !a).length;
+
+    if (empty > 0) {
+      showError('Please answer all six questions before generating your brief.');
+      return;
+    }
+
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('loading-section').style.display = 'block';
+    document.getElementById('error-wrap').style.display = 'none';
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong. Please try again.');
+      }
+
+      const text = data.brief;
+      parseBrief(text);
+
+      document.getElementById('loading-section').style.display = 'none';
+      document.getElementById('brief-section').style.display = 'block';
+
+    } catch (err) {
+      document.getElementById('loading-section').style.display = 'none';
+      document.getElementById('form-section').style.display = 'block';
+      showError(err.message || 'Something went wrong. Please try again.');
+    }
+  }
+
+  function parseBrief(text) {
+    const sections = [
+      { key: 'Current state', outId: 'out-1' },
+      { key: 'What needs attention first', outId: 'out-2' },
+      { key: 'Constraints in play', outId: 'out-3' },
+      { key: 'Open question', outId: 'out-4' },
+      { key: 'How to start right now', outId: 'out-5' }
+    ];
+
+    sections.forEach((s, i) => {
+      const next = sections[i + 1];
+      const start = text.indexOf(s.key + ':');
+      const end = next ? text.indexOf(next.key + ':') : text.length;
+      if (start !== -1) {
+        const content = text.slice(start + s.key.length + 1, end).trim();
+        document.getElementById(s.outId).textContent = content;
+      }
+    });
+  }
+
+  function copyBrief() {
+    const sections = [
+      { label: 'Current state', id: 'out-1' },
+      { label: 'What needs attention first', id: 'out-2' },
+      { label: 'Constraints in play', id: 'out-3' },
+      { label: 'Open question', id: 'out-4' },
+      { label: 'How to start right now', id: 'out-5' }
+    ];
+    const text = sections.map(s =>
+      s.label.toUpperCase() + '\n' + document.getElementById(s.id).textContent
+    ).join('\n\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      const confirm = document.getElementById('copy-confirm');
+      confirm.style.display = 'block';
+      setTimeout(() => confirm.style.display = 'none', 3000);
+    });
+  }
+
+  function restart() {
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el.tagName === 'SELECT') el.value = '';
+      else el.value = '';
+    });
+    document.querySelectorAll('.form-card').forEach(c => c.classList.remove('answered'));
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('progress-count').textContent = '0 of 6';
+    document.getElementById('brief-section').style.display = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-wrap');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+</script>
+</body>
+</html>
