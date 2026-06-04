@@ -21,8 +21,13 @@ export default async function handler(req, res) {
 Here is the brief you gave them:
 ${brief}
 
-Answer their follow-up questions in the same voice — warm, direct, simple language, no jargon. Be specific to their situation. Keep your answers focused and practical. No more than 3-4 sentences unless the question genuinely needs more. You remember everything you have said in this conversation.`;
+Answer their follow-up questions in the same voice — warm, direct, simple language, no jargon. Be specific to their situation.
 
+Format your response so it is easy to read:
+- Use short paragraphs, not one long block of text.
+- If you are making more than one point, give each point its own line with a clear label or a line break between them.
+- Keep answers focused and practical.
+- Never use asterisks for emphasis.`;
   // Build full conversation history for Claude
   const messages = [];
 
