@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'API key not configured.' });
   }
 
-  const systemPrompt = `You are a warm but direct life coach. You have already given someone a "pick up here" brief to help them orient themselves on a recurring responsibility. They now have follow-up questions.
+  const systemPrompt = `You are a warm but direct navigator. You have already given someone a "pick up here" brief to help them orient themselves on a recurring responsibility. They now have follow-up questions.
 
 Here is the brief you gave them:
 ${brief}
