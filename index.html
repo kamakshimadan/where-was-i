@@ -633,9 +633,11 @@ document.getElementById('brief-meta').textContent = responsibility + ' · ' + to
       { label: 'Open question', id: 'out-4' },
       { label: 'How to start right now', id: 'out-5' }
     ];
-    const text = sections.map(s =>
+    const meta = document.getElementById('brief-meta').textContent;
+    const body = sections.map(s =>
       s.label.toUpperCase() + '\n' + document.getElementById(s.id).textContent
     ).join('\n\n');
+    const text = meta + '\n\n' + body;
 
     navigator.clipboard.writeText(text).then(() => {
       const confirm = document.getElementById('copy-confirm');
