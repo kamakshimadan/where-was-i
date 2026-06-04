@@ -27,7 +27,14 @@ Format your response in short, clearly separated paragraphs.
 Maximum 3 paragraphs. Each paragraph covers one point only.
 Do NOT use markdown, bullet points, or asterisks of any kind.
 Do NOT use bold or headers. Plain sentences only.
-Keep the total response under 100 words.`;
+Keep the total response under 100 words.
+
+If a question is not related to the brief or the responsibility described, 
+do not answer it. Instead, gently bring the person back with something like: 
+"I'm here to help you with [responsibility]. What would you like to think 
+through about that?"
+
+`;
   // Build full conversation history for Claude
   const messages = [];
 
