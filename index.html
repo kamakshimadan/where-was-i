@@ -688,7 +688,16 @@ const metaLine = meta ? meta + '\n\n' : '';
 
   async function askFollowup() {
     const question = document.getElementById('followup-input').value.trim();
-    if (!question) return;
+if (!question) {
+  const input = document.getElementById('followup-input');
+  input.style.borderColor = 'var(--accent)';
+  input.placeholder = 'Please type a question first.';
+  setTimeout(() => {
+    input.style.borderColor = '';
+    input.placeholder = 'e.g. What if I can\'t find a free hour today?';
+  }, 2000);
+  return;
+}
 
     const brief = getBriefText();
     const btn = document.getElementById('followup-btn');
