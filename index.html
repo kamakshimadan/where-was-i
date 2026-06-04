@@ -66,8 +66,13 @@
   }
 
   .progress-wrap {
-    margin: 0 0 2rem;
-  }
+  margin: 0 0 2rem;
+  position: sticky;
+  top: 0;
+  background: var(--warm);
+  padding: 1rem 0 0.5rem;
+  z-index: 10;
+}
 
   .progress-label {
     display: flex;
@@ -502,7 +507,7 @@
         <div style="font-size: 0.85rem; color: var(--ink-light); margin-top: 0.75rem; font-style: italic;">Thinking…</div>
       </div>
 
-      <div id="followup-answers" style="max-height: 480px; overflow-y: auto; scroll-behavior: smooth;"></div>
+<div id="followup-answers" style="max-height: 480px; overflow-y: auto; scroll-behavior: smooth; margin-top: 1.5rem;"></div>
     </div>
 
   </div>
