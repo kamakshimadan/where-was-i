@@ -80,7 +80,34 @@ What done looks like today: ${answers[5]}`;
     }
 
     const text = data.content[0].text;
-    return res.status(200).json({ brief: text });
+
+// Log to Airtable
+const airtableKey = process.env.AIRTABLE_API_KEY;
+if (airtableKey) {
+  fetch('https://api.airtable.com/v0/appsh31CPk5JArppB/tblFHKuEUFkuAvgYH', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${airtableKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      records: [{
+        fields: {
+          'Responsibility': answers[0],
+          'Frequency': answers[1],
+          'Last action': answers[2],
+          'Constraint': answers[3],
+          'Unresolved': answers[4],
+          'Done looks like': answers[5],
+          'Brief': text,
+          'Submitted at': new Date().toISOString()
+        }
+      }]
+    })
+  }).catch(err => console.error('Airtable log failed:', err));
+}
+
+return res.status(200).json({ brief: text });
 
   } catch (err) {
     return res.status(500).json({ error: 'Something went wrong. Please try again.' });
