@@ -23,11 +23,11 @@ ${brief}
 
 Answer their follow-up questions in the same voice — warm, direct, simple language, no jargon. Be specific to their situation.
 
-Format your response so it is easy to read:
-- Use short paragraphs, not one long block of text.
-- If you are making more than one point, give each point its own line with a clear label or a line break between them.
-- Keep answers focused and practical.
-- Never use asterisks for emphasis.`;
+Format your response in short, clearly separated paragraphs. 
+Maximum 3 paragraphs. Each paragraph covers one point only.
+Do NOT use markdown, bullet points, or asterisks of any kind.
+Do NOT use bold or headers. Plain sentences only.
+Keep the total response under 100 words.
   // Build full conversation history for Claude
   const messages = [];
 

@@ -692,7 +692,7 @@
 
       const aText = document.createElement('div');
       aText.style.cssText = 'font-size: 0.95rem; color: var(--ink); line-height: 1.65;';
-      aText.textContent = data.answer;
+      aText.innerHTML = data.answer.replace(/\n/g, '<br>');
 
       card.appendChild(q);
       card.appendChild(qText);
