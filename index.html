@@ -477,9 +477,10 @@
   <!-- Brief output -->
   <div class="brief-wrap" id="brief-section">
     <div class="brief-header">
-      <div class="brief-title">Your brief is ready</div>
-      <div class="brief-subtitle">Read this before you do anything else.</div>
-    </div>
+  <div class="brief-title">Your brief is ready</div>
+  <div class="brief-subtitle">Read this before you do anything else.</div>
+  <div id="brief-meta" style="margin-top: 0.75rem; font-size: 0.82rem; color: var(--ink-light); letter-spacing: 0.01em;"></div>
+</div>
 
     <div class="brief-section" id="section-1">
       <div class="section-label">Current state</div>
@@ -589,6 +590,9 @@
       }
 
       const text = data.brief;
+      const responsibility = document.getElementById('q1').value.trim();
+const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+document.getElementById('brief-meta').textContent = responsibility + ' · ' + today;
       parseBrief(text);
 
       document.getElementById('loading-section').style.display = 'none';
