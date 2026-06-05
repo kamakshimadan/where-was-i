@@ -84,7 +84,7 @@ What done looks like today: ${answers[5]}`;
 // Log to Airtable
 const airtableKey = process.env.AIRTABLE_API_KEY;
 if (airtableKey) {
-  fetch('https://api.airtable.com/v0/appsh31CPk5JArppB/tblFHKuEUFkuAvgYH', {
+  await fetch('https://api.airtable.com/v0/appsh31CPk5JArppB/tblFHKuEUFkuAvgYH', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${airtableKey}`,
