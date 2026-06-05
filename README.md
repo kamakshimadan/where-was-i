@@ -121,9 +121,6 @@ To observe what problems people actually bring — not what was assumed during d
 ## What's next
 
 - Session ID linking — connect follow-up rows to their original brief in Airtable
-- Brief header — show responsibility name and date at the top of the brief
-- Scope boundary — prevent the navigator from going outside the responsibility context
-- Empty submit nudge — prompt users who try to submit without filling all questions
 
 ---
 
@@ -131,7 +128,7 @@ To observe what problems people actually bring — not what was assumed during d
 
 Kamakshi Madan — Product Designer, Viber AI Cohort, Challenge Week build.
 
-[github.com/kamakshimadan](https://github.com/kamakshimadan)
+[github.com/kamakshimadan/where-was-i](https://github.com/kamakshimadan/where-was-i)
 
 Built in Week 9 of a 66-day structured AI learning cohort. First build for strangers (previous build, a meal planning agent, was for myself and my cook).
 
